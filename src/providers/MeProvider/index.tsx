@@ -21,16 +21,35 @@ function useMeHook() {
   const [me, setMe] = useState<Me | null>();
   const [isReturning, setIsReturning] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [email, setEmail] = useState('');
+  const [verificationAttemps, setVerificationAttemps] = useState(3);
 
   function disconnect() {
     localStorage.removeItem("passkeys4337.me");
     setMe(null);
   }
 
-  async function create(username: string) {
+  async function create(
+    email: string,
+    verificationCode: Record<number, string>
+  ) {
+    if (verificationAttemps <= 0) {
+      return;
+    }
+
+    // sets loading display
     setIsLoading(true);
+
     try {
-      const credential = await WebAuthn.create({ username });
+      const codesVerified: boolean = await verifyCodes(email, verificationCode);
+
+      if (!codesVerified) {
+        setVerificationAttemps(verificationAttemps - 1);
+        return;
+      }
+
+      // makes passkey creation request
+      const credential = await WebAuthn.create({ username: email });
 
       if (!credential) {
         return;
@@ -38,6 +57,8 @@ function useMeHook() {
       const user = await saveUser({
         id: credential.rawId,
         pubKey: credential.pubKey,
+        email,
+        verificationCode
       });
 
       const me = {
@@ -95,6 +116,31 @@ function useMeHook() {
     }
   }
 
+  const genEmail = async (email: string, startTimer: () => void) => {
+    setEmail(email);
+    //setIsLoading(true);
+
+    try {
+
+
+      startTimer();
+
+      /** TODO - Fill in fuction
+       * Job - Send request to backend,
+       * 200 -> move to confirm code page,
+       * 400 -> invalid email
+       * Connenction refused - will need to handle
+       * else -> error has occured
+       */
+    } catch (e) {
+
+    }
+  }
+
+  const clearEmail = async () => {
+    setEmail('');
+  }
+
   useEffect(() => {
     const me = localStorage.getItem("passkeys4337.me");
     const returning = localStorage.getItem("passkeys4337.returning");
@@ -119,6 +165,11 @@ function useMeHook() {
     create,
     get,
     disconnect,
+    genEmail,
+    clearEmail,
+    hasEmail: email.length !== 0,
+    storedEmail: email,
+    verificationAttemps,
   };
 }
 
