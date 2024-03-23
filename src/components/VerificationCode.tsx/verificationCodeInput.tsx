@@ -20,6 +20,7 @@ const VerificationCodeInput = ({
         width: "calc(2ch + 2rem)",
         fontSize: "2em",
         textAlign: "center",
+        textIndent: "0",
       }}
     />
   )

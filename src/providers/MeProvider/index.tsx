@@ -6,6 +6,9 @@ import { WebAuthn } from "@/libs/web-authn/service/web-authn";
 import { saveUser } from "@/libs/factory";
 import { getUser } from "@/libs/factory/getUser";
 import { walletConnect } from "@/libs/wallet-connect/service/wallet-connect";
+import { verifyTormoOtpCode } from "@/app/api/top/verifyTormoOtpCode/route";
+import { generateTormoOtpCode } from "@/app/api/top/generateTormoOtpCode/route";
+import { checkEmailIsValid } from "@/utils/checkEmailIsValid";
 
 export type Me = {
   account: Address;
@@ -16,12 +19,19 @@ export type Me = {
   };
 };
 
+const emailErrorMessages = {
+  invalid: "*Invalid email",
+  taken: "*Email is already in use"
+}
+
 function useMeHook() {
   const [isLoading, setIsLoading] = useState(false);
   const [me, setMe] = useState<Me | null>();
   const [isReturning, setIsReturning] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMassage] = useState('');
   const [verificationAttemps, setVerificationAttemps] = useState(3);
 
   function disconnect() {
@@ -31,7 +41,7 @@ function useMeHook() {
 
   async function create(
     email: string,
-    verificationCode: Record<number, string>
+    verificationCodes: Record<number, string>
   ) {
     if (verificationAttemps <= 0) {
       return;
@@ -41,7 +51,7 @@ function useMeHook() {
     setIsLoading(true);
 
     try {
-      const codesVerified: boolean = await verifyCodes(email, verificationCode);
+      const codesVerified: boolean = await verifyTormoOtpCode(email, verificationCodes);
 
       if (!codesVerified) {
         setVerificationAttemps(verificationAttemps - 1);
@@ -58,7 +68,7 @@ function useMeHook() {
         id: credential.rawId,
         pubKey: credential.pubKey,
         email,
-        verificationCode
+        otp_code: verificationCodes
       });
 
       const me = {
@@ -116,24 +126,40 @@ function useMeHook() {
     }
   }
 
-  const genEmail = async (email: string, startTimer: () => void) => {
+  const genEmail = async (email: string, startTimer: () => void): Promise<void> => {
+    setIsLoading(true);
     setEmail(email);
-    //setIsLoading(true);
 
     try {
+      if (!checkEmailIsValid(email)) {
+        setEmailError(true);
+        setEmailErrorMassage(emailErrorMessages.invalid);
+      }
 
+      const { success, details } = await generateTormoOtpCode(email);
 
-      startTimer();
+      if (success) {
+        startTimer();
 
-      /** TODO - Fill in fuction
-       * Job - Send request to backend,
-       * 200 -> move to confirm code page,
-       * 400 -> invalid email
-       * Connenction refused - will need to handle
-       * else -> error has occured
-       */
+        setIsLoading(false);
+      } else {
+        setEmailError(true);
+
+        if (details && details.invalid) {
+          setEmailErrorMassage(emailErrorMessages.invalid);
+        } else if (details && details.taken) {
+          setEmailErrorMassage(emailErrorMessages.taken);
+        } else {
+          setEmailErrorMassage('');
+
+          window.alert('An error has occurred');
+        }
+
+        clearEmail();
+        setIsLoading(false);
+      }
     } catch (e) {
-
+      console.log(e);
     }
   }
 

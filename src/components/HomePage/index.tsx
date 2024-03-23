@@ -8,6 +8,8 @@ import NavBar from "../NavBar";
 import History from "../History";
 import TopBar from "../TopBar";
 import LogoAnimated from "../LogoAnimated";
+import NftDisplay from "../NftDisplay";
+import { NftProvider } from "@/providers/NftProvider";
 
 export default function Home() {
   const { me, isMounted } = useMe();
@@ -21,6 +23,7 @@ export default function Home() {
           <TopBar />
           <Balance />
           <NavBar />
+          <NftProvider children={<NftDisplay />} />
         </Flex>
         <History />
       </Flex>
