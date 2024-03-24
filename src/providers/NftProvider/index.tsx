@@ -2,6 +2,12 @@
 
 import { createContext, useContext, useState } from "react";
 
+export type NFT = {
+  name: string,
+  discription: string,
+  imgUrl: string
+}
+
 function useNftHook() {
   const [isLoading, setIsLoading] = useState(false);
   const [nfts, setNfts] = useState({});

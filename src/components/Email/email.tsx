@@ -1,5 +1,5 @@
 
-import { Button, Flex, TextField } from "@radix-ui/themes";
+import { Button, Flex, TextField, Heading, Text } from "@radix-ui/themes";
 import LogoAnimated from "../LogoAnimated";
 
 const Email = ({
@@ -38,13 +38,23 @@ const Email = ({
             }
           }}
         >
+          {createForm &&
+            <Heading size="9">Sign Up</Heading>
+          }
+
+          {!createForm &&
+            <Heading size="9">Log In</Heading>
+          }
+
           <LogoAnimated
             style={{
-              width: "240px",
+              width: "150px",
             }}
           />
+
           {createForm && (
             <Flex gap={"2"} style={{ width: "85%", flexDirection: "column", alignItems: "center" }}>
+              <Text>Please sign up with your email</Text>
               <TextField.Input
                 required
                 value={email}
@@ -68,10 +78,14 @@ const Email = ({
               </Button>
             </Flex>
           )}
+
           {!createForm && (
-            <Button style={{ width: "250px" }} variant={"outline"} size={"3"} type={"submit"}>
-              LOG IN
-            </Button>
+            <Flex direction='column' align='center' >
+              <Text>Please login with your existing passkey</Text>
+              <Button style={{ width: "250px" }} variant={"outline"} size={"3"} type={"submit"}>
+                LOG IN
+              </Button>
+            </Flex>
           )}
         </form>
     )

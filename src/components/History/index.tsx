@@ -17,32 +17,36 @@ export default function History() {
 
   if (minimize) {
     return (
-      <div style={{ display: "flex", justifyContent: "flex-end", padding:"0px 10px", position: "relative" }}>
-        <Button
-          size="2"
-          variant="outline"
-          style={{
-            marginTop: "0.3rem",
-            overflow: "hidden",
-            width: "min-content",
-            padding: "18px",
-            aspectRatio: "1 / 1"
-          }}
-          onClick={toggleMinimize}
-        >
-          <Callout.Root style={{ marginTop: 0 }}>
-            <Callout.Text style={{ fontSize: "1.4em" }}>
-              &#94;
-            </Callout.Text>
-          </Callout.Root>
-        </Button>
-      </div>
+      <Flex justify="end" style={{ width: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "flex-end", padding:"0px 10px", position: "relative" }}>
+          <Button
+            size="2"
+            variant="outline"
+            style={{
+              marginTop: "0.3rem",
+              overflow: "hidden",
+              width: "min-content",
+              padding: "18px",
+              aspectRatio: "1 / 1"
+            }}
+            onClick={toggleMinimize}
+          >
+            <Callout.Root style={{ marginTop: 0 }}>
+              <Callout.Text style={{ fontSize: "1.4em" }}>
+                &#94;
+              </Callout.Text>
+            </Callout.Root>
+          </Button>
+        </div>
+      </Flex>
     )
   } else {
     return (
       <Callout.Root style={{ marginTop: 0, position: "relative" }}>
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <LogoAnimatedLight style={{ width: "60%", marginBottom: ".5rem" }} />
+          <div style={{ width: "50px", height: "50px" }}>
+            <LogoAnimatedLight style={{ width: "60%", marginBottom: ".5rem" }} />
+          </div>
           <Button
             size="2"
             variant="outline"

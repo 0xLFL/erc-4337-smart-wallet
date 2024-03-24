@@ -1,13 +1,20 @@
 import { GearIcon } from "@radix-ui/react-icons";
-import { Flex, IconButton, Text } from "@radix-ui/themes";
+import { Flex, IconButton, Text, Button } from "@radix-ui/themes";
 import Address from "../Address";
 import Link from "next/link";
+import LogoAnimated from "../LogoAnimated";
+import LogoButton from "../LogoButton";
 
 export default function TopBar() {
   return (
     <Flex width="100%" justify="between" align="center" style={{ position: "relative" }}>
       <Flex gap="2" align={"center"}>
-        <Address style={{ alignSelf: "center" }} />
+        <Flex gap="2" align={"center"}>
+          <LogoButton />
+        </Flex>
+        <Flex gap="2" align={"center"}>
+          <Address style={{ alignSelf: "center" }} />
+        </Flex>
       </Flex>
 
       <Link href={"/settings"}>

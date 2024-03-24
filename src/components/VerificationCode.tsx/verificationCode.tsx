@@ -64,7 +64,7 @@ const VerificationCode = ({
     }}>
       <LogoAnimated
         style={{
-          width: "240px",
+          width: "150px",
         }}
       />
       <div style={{

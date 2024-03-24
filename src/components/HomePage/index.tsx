@@ -19,7 +19,7 @@ export default function Home() {
   if (me) {
     return (
       <Flex direction="column" width="100%" justify={"between"}>
-        <Flex direction="column" width="100%">
+        <Flex direction="column" align="center" width="100%">
           <TopBar />
           <Balance />
           <NavBar />

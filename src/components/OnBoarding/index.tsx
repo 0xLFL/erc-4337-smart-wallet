@@ -6,6 +6,7 @@ import ThemeButton from "../ThemeButton";
 import Spinner from "../Spinner";
 import Email from "../Email/email";
 import VerificationCode from "../VerificationCode.tsx/verificationCode";
+import LogoButton from "../LogoButton";
 
 export default function OnBoarding() {
   const numOfCodes = 4;
@@ -69,13 +70,7 @@ export default function OnBoarding() {
       style={{ position: "relative", width: "100%", gap: "2rem" }}
     >
       <Flex justify={"between"} align={"baseline"} width={"100%"}>
-        <IconButton
-          onClick={() => window.open("https://github.com/passkeys-4337/smart-wallet", "_blank")}
-          variant="soft"
-          size={"3"}
-        >
-          <GitHubLogoIcon />
-        </IconButton>
+        <LogoButton />
 
         <ThemeButton />
       </Flex>

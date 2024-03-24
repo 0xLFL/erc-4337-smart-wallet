@@ -11,6 +11,7 @@ import { useWalletConnect } from "@/libs/wallet-connect";
 import SessionCard from "../SessionCard";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import LogoAnimated from "../LogoAnimated";
 
 export default function SettingsPage() {
   const { me, disconnect, isMounted } = useMe();
@@ -32,9 +33,14 @@ export default function SettingsPage() {
             </IconButton>
           </Link>
         </Flex>
-        <Heading as="h1" style={{ textAlign: "center" }} size={"8"}>
-          Settings
-        </Heading>
+        <Flex direction='column' align='center' style={{ width: "100%"}}>
+          <Heading as="h1" style={{ textAlign: "center" }} size={"8"}>
+            Settings
+          </Heading>
+
+          <LogoAnimated style={{ width: "50%" }} />
+        </Flex>
+
         <Flex direction="column" width={"100%"} align={"start"} gap={"2"}>
           <Text>On Sepolia testnet only:</Text>
           <Flex style={{ width: "100%" }} align={"center"} gap="2" justify={"between"}>
