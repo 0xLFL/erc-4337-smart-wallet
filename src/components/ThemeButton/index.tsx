@@ -12,6 +12,8 @@ type Props = {
 export default function ThemeButton({ style }: Props) {
   const { theme, setTheme, systemTheme } = useTheme();
 
+  console.log(systemTheme)
+
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);

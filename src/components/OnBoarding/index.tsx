@@ -1,16 +1,66 @@
 import { useMe } from "@/providers/MeProvider";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
-import { Button, Flex, Link, TextField, IconButton, Text } from "@radix-ui/themes";
-import { useState } from "react";
+import { Flex, Link, IconButton } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
 import ThemeButton from "../ThemeButton";
-import LogoAnimated from "../LogoAnimated";
 import Spinner from "../Spinner";
-import BaseLogo from "../BaseLogo";
+import Email from "../Email/email";
+import VerificationCode from "../VerificationCode.tsx/verificationCode";
+import LogoButton from "../LogoButton";
 
 export default function OnBoarding() {
-  const [username, setUsername] = useState("");
-  const { create, get, returning, isLoading } = useMe();
+  const numOfCodes = 4;
+  const resendTimerInit = 30;
+
+  const [email, setEmail] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
+  const [verificationCode, setVerificationCode]= useState(() => {
+    const codes: Record<number, string> = {}
+    for (let i = 1; i <= numOfCodes; i++) {
+      codes[i] = '';
+    }
+
+    return codes;
+  })
+  const {
+    genEmail,
+    create,
+    get,
+    returning,
+    isLoading,
+    hasEmail,
+    storedEmail,
+    clearEmail,
+  } = useMe();
   const [createForm, setCreateForm] = useState(!returning);
+
+  const startTimer = async () => {
+    setResendTimer(resendTimerInit)
+  }
+
+  const setCode = (key: number, val: string) => {
+    const numRegex = /^\d{0,2}$/;
+    console.log(val, key, key >= 1, key <= numOfCodes, numRegex.test(val))
+    if (key >= 1 && key <= numOfCodes && numRegex.test(val)) {
+      console.log(val)
+      setVerificationCode(prevState => ({
+        ...prevState,
+        [key]: val
+      }));
+    }
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (resendTimer > 0) {
+        setResendTimer(prevResendTimer => prevResendTimer - 1);
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [resendTimer]);
 
   return (
     <Flex
@@ -20,79 +70,42 @@ export default function OnBoarding() {
       style={{ position: "relative", width: "100%", gap: "2rem" }}
     >
       <Flex justify={"between"} align={"baseline"} width={"100%"}>
-        <IconButton
-          onClick={() => window.open("https://github.com/passkeys-4337/smart-wallet", "_blank")}
-          variant="soft"
-          size={"3"}
-        >
-          <GitHubLogoIcon />
-        </IconButton>
+        <LogoButton />
 
         <ThemeButton />
       </Flex>
 
       {isLoading && <Spinner />}
 
-      {!isLoading && (
-        <form
-          style={{
-            width: "100%",
-            display: "flex",
-            flexDirection: "column",
-            gap: "1rem",
-            alignItems: "center",
-          }}
-          onSubmit={(e) => {
-            if (createForm) {
-              e.preventDefault();
-              username && create(username);
-            }
+      {!isLoading && !hasEmail &&
+        <Email
+          createForm={createForm}
+          email={email}
+          create={async (email: string) => { await genEmail(email, startTimer) }}
+          get={get}
+          isLoading={isLoading}
+          setEmail={(email: string) => { setEmail(email) }}
+        />
+      }
 
-            if (!createForm) {
-              e.preventDefault();
-              get();
-            }
-          }}
-        >
-          <LogoAnimated
-            style={{
-              width: "240px",
-            }}
-          />
-          {createForm && (
-            <Flex gap={"2"} style={{ width: "250px" }}>
-              <TextField.Input
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Wallet name"
-                disabled={isLoading}
-                size={"3"}
-                style={{
-                  padding: "0.5rem",
-                }}
-              />
-
-              <Button
-                style={{ width: "110px", textAlign: "center" }}
-                variant={"outline"}
-                size={"3"}
-                type={"submit"}
-              >
-                CREATE
-              </Button>
-            </Flex>
-          )}
-          {!createForm && (
-            <Button style={{ width: "250px" }} variant={"outline"} size={"3"} type={"submit"}>
-              LOG IN
-            </Button>
-          )}
-        </form>
-      )}
+      {!isLoading && hasEmail &&
+        <VerificationCode
+          verificationCode={verificationCode}
+          setCode={setCode}
+          create={create}
+          email={storedEmail}
+          isLoading={isLoading}
+          createForm={createForm}
+          get={get}
+          numOfCodes={numOfCodes}
+          genEmail={() => { genEmail(storedEmail, startTimer) }}
+          clearEmail={clearEmail}
+          resendTimer={resendTimer}
+        />
+      }
 
       <Flex style={{ width: "100%", whiteSpace: "nowrap" }} justify={"end"}>
-        {!createForm && !isLoading && (
+        {!createForm && !isLoading && !hasEmail && (
           <Link
             onClick={() => {
               !isLoading && setCreateForm(true);
@@ -103,7 +116,7 @@ export default function OnBoarding() {
           </Link>
         )}
 
-        {createForm && !isLoading && (
+        {createForm && !isLoading && !hasEmail && (
           <Link onClick={() => !isLoading && setCreateForm(false)} size={"2"}>
             or log in with an existing passkey
           </Link>

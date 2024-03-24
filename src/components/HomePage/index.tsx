@@ -8,6 +8,8 @@ import NavBar from "../NavBar";
 import History from "../History";
 import TopBar from "../TopBar";
 import LogoAnimated from "../LogoAnimated";
+import NftDisplay from "../NftDisplay";
+import { NftProvider } from "@/providers/NftProvider";
 
 export default function Home() {
   const { me, isMounted } = useMe();
@@ -17,10 +19,11 @@ export default function Home() {
   if (me) {
     return (
       <Flex direction="column" width="100%" justify={"between"}>
-        <Flex direction="column" width="100%">
+        <Flex direction="column" align="center" width="100%">
           <TopBar />
           <Balance />
           <NavBar />
+          <NftProvider children={<NftDisplay />} />
         </Flex>
         <History />
       </Flex>
